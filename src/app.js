@@ -1,1 +1,1 @@
-console.log('test');
+console.log('Welcome to your new webpack tailwind project!');
