@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 var BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 
 let runMode = "development";
 
@@ -43,7 +44,40 @@ function generatePlugins(envMode) {
   }
 }
 
+function generateOptimization(envMode) {
+
+  if (envMode === 'production') {
+
+    return {
+      minimizer: [
+        "...",
+        new ImageMinimizerPlugin({
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: {
+              // Lossless optimization with custom option
+              // Feel free to experiment with options for better result for you
+              plugins: [
+                ["gifsicle", { interlaced: true }],
+                ["jpegtran", { progressive: true }],
+                ["optipng", { optimizationLevel: 5 }],
+              ],
+            },
+          },
+        }),
+      ],
+    };
+
+  } else {
+    return {};
+  }
+  
+}
+
 const buildPlugins = generatePlugins(runMode);
+
+const buildOptimization = generateOptimization(runMode);
+
 
 module.exports = {
   entry: {
@@ -117,4 +151,5 @@ module.exports = {
 			],
 		})
 	].concat(buildPlugins),
+  optimization: buildOptimization,
 }
